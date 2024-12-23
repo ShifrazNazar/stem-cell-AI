@@ -59,6 +59,12 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// root
+app.get("/", (req, res) => {
+  res.json({
+    message: "Hello World!",
+  });
+});
 app.use("/auth", authRoute);
 app.use("/reports", reportsRoute);
 app.use("/payments", paymentsRoute);
