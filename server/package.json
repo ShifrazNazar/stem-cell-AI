@@ -2,11 +2,12 @@
   "name": "server",
   "version": "1.0.0",
   "main": "app.js",
-  "scripts": {
-    "start": "ts-node dist/app.js",
-    "build": "tsc",
-    "dev": "nodemon --watch 'src/**/*' --exec 'ts-node src/app.ts'"
-  },
+"scripts": {
+  "start": "node --max-old-space-size=512 dist/app.js",
+  "build": "tsc",
+  "dev": "nodemon --watch 'src/**/*' --exec 'node --max-old-space-size=512 --loader ts-node/esm src/app.ts'"
+}
+,
   "keywords": [],
   "author": "",
   "license": "ISC",
