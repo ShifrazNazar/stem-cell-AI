@@ -63,7 +63,6 @@ app.use("/auth", authRoute);
 app.use("/reports", reportsRoute);
 app.use("/payments", paymentsRoute);
 
-const PORT = 8080;
-app.listen(PORT, () => {
-  console.log(`Server started on port ${PORT}`);
+app.listen(process.env.PORT || 8080, () => {
+  console.log(`Server started on port ${process.env.PORT || 8080}`);
 });
