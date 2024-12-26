@@ -1,3 +1,4 @@
+// src/services/ai.services.ts
 import redis from "../config/redis";
 import { getDocument } from "pdfjs-dist";
 import { GoogleGenerativeAI } from "@google/generative-ai";

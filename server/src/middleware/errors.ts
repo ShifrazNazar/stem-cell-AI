@@ -1,3 +1,4 @@
+// src/middleware/errors.ts
 import { NextFunction, Request, Response } from "express";
 
 export const handleErrors = (

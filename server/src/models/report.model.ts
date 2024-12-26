@@ -1,3 +1,4 @@
+// src/models/report.model.ts
 import mongoose, { Schema } from "mongoose";
 import { IUser } from "./user.model";
 

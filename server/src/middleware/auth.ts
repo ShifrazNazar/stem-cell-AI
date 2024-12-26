@@ -1,3 +1,4 @@
+// src/middleware/auth.ts
 import { NextFunction, Request, Response } from "express";
 
 export const isAuthenticated = (
