@@ -50,7 +50,6 @@ export default function ReportResults({ reportId }: IReportResultsProps) {
     <ReportAnalysisResults
       therapyId={reportId}
       analysisResults={analysisResults}
-      isActive={true}
       onUpgrade={function (): void {
         throw new Error("Function not implemented.");
       }}
