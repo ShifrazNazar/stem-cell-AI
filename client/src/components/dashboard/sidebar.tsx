@@ -34,6 +34,16 @@ const SidebarContent = () => {
       href: "/dashboard/results",
     },
     {
+      icon: Home,
+      label: "Patient Management",
+      href: "/dashboard/patient-management",
+    },
+    {
+      icon: Home,
+      label: "Vision Analysis",
+      href: "/dashboard/vision-analysis",
+    },
+    {
       icon: Settings,
       label: "Settings",
       href: "/dashboard/settings",
