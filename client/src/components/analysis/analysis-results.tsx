@@ -15,17 +15,16 @@ import { Badge } from "../ui/badge";
 
 interface IBodyCheckupAnalysisResultsProps {
   analysisResults: BodyCheckupAnalysis;
-  isActive: boolean;
   therapyId: string;
   onUpgrade: () => void;
 }
 
 export default function BodyCheckupAnalysisResults({
   analysisResults,
-  isActive,
 }: IBodyCheckupAnalysisResultsProps) {
   const [activeTab, setActiveTab] = useState("summary");
 
+  const isActive = true;
   if (!analysisResults) {
     return (
       <div className="text-center text-gray-500 py-8">

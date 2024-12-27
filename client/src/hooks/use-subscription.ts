@@ -18,7 +18,6 @@ export function useSubscription() {
   } = useQuery({
     queryKey: ["subscriptionStatus"],
     queryFn: fetchSubscriptionStatus,
-    // enabled: !!user,
   });
 
   async function fetchSubscriptionStatus() {
