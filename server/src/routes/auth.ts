@@ -23,8 +23,8 @@ router.get("/current-user", (req, res) => {
   console.log("Session ID:", req.sessionID);
   console.log("Cookies:", req.cookies);
   console.log("User:", req.user);
-  console.log("NODE_ENV:", process.env.NODE_ENV);
-  console.log("CLIENT_URL:", process.env.CLIENT_URL);
+  console.log("Authenticated:", req.isAuthenticated());
+  console.log("User Agent:", req.get("User-Agent"));
   if (req.isAuthenticated()) {
     res.json(req.user);
   } else {
