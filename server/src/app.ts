@@ -12,16 +12,19 @@ import session from "express-session";
 import MongoStore from "connect-mongo";
 import "./config/passport";
 
-// routes
+// Routes
 import authRoute from "./routes/auth";
 import reportsRoute from "./routes/reports";
 
 const app = express();
+
+// MongoDB Connection
 mongoose
   .connect(process.env.MONGODB_URI!)
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error(err));
 
+// CORS Configuration
 app.use(
   cors({
     origin: process.env.CLIENT_URL,
@@ -46,7 +49,7 @@ app.use(
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      domain: process.env.NODE_ENV === "production" ? ".vercel.app" : undefined,
+      // domain: process.env.NODE_ENV === "production" ? ".vercel.app" : undefined,
     },
   })
 );
@@ -54,12 +57,12 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// root
+// Root Route
 app.get("/", (req, res) => {
-  res.json({
-    message: "Hello World!",
-  });
+  res.json({ message: "Hello World!" });
 });
+
+// Routes
 app.use("/auth", authRoute);
 app.use("/reports", reportsRoute);
 
