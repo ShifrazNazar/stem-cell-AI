@@ -46,19 +46,14 @@ app.use(
     rolling: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
     cookie: {
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: true,
+      httpOnly: true,
+      sameSite: "none",
+      domain: process.env.NODE_ENV === "production" ? ".shifraz.me" : undefined,
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      domain: process.env.NODE_ENV === "production" ? ".vercel.app" : undefined,
     },
   })
 );
-
-app.use((req, res, next) => {
-  console.log("Cookies app.ts:", req.cookies);
-  console.log("Session app.ts", req.session);
-  next();
-});
 
 app.use(passport.initialize());
 app.use(passport.session());
