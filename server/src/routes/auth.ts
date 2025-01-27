@@ -1,6 +1,7 @@
 // src/routes/auth.ts
 import express from "express";
 import passport from "passport";
+import { Request, Response, NextFunction } from "express";
 
 const router = express.Router();
 
@@ -12,13 +13,13 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", { failureRedirect: "/login" }),
-  (req, res) => {
+  (req: Request, res: Response) => {
     console.log("User authenticated: ", req.user);
     res.redirect(`${process.env.CLIENT_URL}/dashboard`);
   }
 );
 
-router.get("/current-user", (req, res) => {
+router.get("/current-user", (req: Request, res: Response) => {
   console.log("Session:", req.session);
   console.log("Session ID:", req.sessionID);
   console.log("Cookies:", req.cookies);
@@ -32,7 +33,7 @@ router.get("/current-user", (req, res) => {
   }
 });
 
-router.get("/logout", (req, res, next) => {
+router.get("/logout", (req: Request, res: Response, next: NextFunction) => {
   req.logout((err) => {
     if (err) {
       return next(err);

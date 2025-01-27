@@ -1,5 +1,6 @@
 // src/app.ts
 import dotenv from "dotenv";
+import { Request, Response, NextFunction } from "express";
 
 dotenv.config();
 import express from "express";
@@ -57,8 +58,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Root Route
-app.get("/", (req, res) => {
-  res.json({ message: "Hello World!" });
+app.get("/route", (req: Request, res: Response, next: NextFunction) => {
+  res.send("Hello, world!");
 });
 
 // Routes
