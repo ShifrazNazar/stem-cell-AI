@@ -13,6 +13,7 @@ GlobalWorkerOptions.workerSrc = path.join(
 const AI_MODEL = "gemini-pro";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 const aiModel = genAI.getGenerativeModel({ model: AI_MODEL });
+const MAX_INPUT_LENGTH = 2000; // Limit input size
 
 export const extractTextFromPDF = async (fileKey: string): Promise<string> => {
   try {
@@ -55,12 +56,14 @@ export const extractTextFromPDF = async (fileKey: string): Promise<string> => {
 export const detectReportType = async (
   aiReportText: string
 ): Promise<string> => {
+  const trimmedText = aiReportText.substring(0, MAX_INPUT_LENGTH);
+
   const prompt = `
     Based on the content provided below, classify the type of medical report. Focus on whether it relates to stem cell therapy or general health checkup analysis.
     Provide a concise classification without additional explanation. Examples: "Body Checkup Report", "Stem Cell Report".
 
     Report Content:
-    ${aiReportText.substring(0, 2000)}
+    ${trimmedText}
   `;
 
   try {
