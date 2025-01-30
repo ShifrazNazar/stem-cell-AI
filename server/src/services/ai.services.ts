@@ -1,7 +1,14 @@
 // src/services/ai.services.ts
 import redis from "../config/redis";
-import { getDocument } from "pdfjs-dist";
+import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import path from "path";
+
+// Ensure worker path is set for Node.js
+GlobalWorkerOptions.workerSrc = path.join(
+  __dirname,
+  "../../node_modules/pdfjs-dist/build/pdf.worker.js"
+);
 
 const AI_MODEL = "gemini-pro";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
@@ -10,9 +17,7 @@ const aiModel = genAI.getGenerativeModel({ model: AI_MODEL });
 export const extractTextFromPDF = async (fileKey: string): Promise<string> => {
   try {
     const fileData = await redis.get(fileKey);
-    if (!fileData) {
-      throw new Error("File not found in Redis.");
-    }
+    if (!fileData) throw new Error("File not found in Redis.");
 
     let fileBuffer: Uint8Array;
     if (Buffer.isBuffer(fileData)) {
@@ -28,7 +33,12 @@ export const extractTextFromPDF = async (fileKey: string): Promise<string> => {
       throw new Error("File data format not recognized.");
     }
 
-    const pdf = await getDocument({ data: fileBuffer }).promise;
+    // Disable worker in a Node.js environment
+    const pdf = await getDocument({
+      data: fileBuffer,
+      disableWorker: true,
+    } as any).promise;
+
     let text = "";
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
