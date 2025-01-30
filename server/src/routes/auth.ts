@@ -15,6 +15,7 @@ router.get(
   passport.authenticate("google", { failureRedirect: "/login" }),
   (req: Request, res: Response) => {
     console.log("User authenticated: ", req.user);
+    console.log("Session ID:", req.sessionID);
     res.redirect(`${process.env.CLIENT_URL}/dashboard`);
   }
 );

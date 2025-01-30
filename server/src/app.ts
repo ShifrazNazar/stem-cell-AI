@@ -46,9 +46,9 @@ app.use(
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
     cookie: {
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      secure: false, // Temporarily disable
+      sameSite: "lax", // Temporarily change to "lax"
+      maxAge: 24 * 60 * 60 * 1000,
       domain: process.env.NODE_ENV === "production" ? ".shifraz.me" : undefined,
     },
   })
@@ -58,7 +58,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Root Route
-app.get("/route", (req: Request, res: Response, next: NextFunction) => {
+app.get("/", (req: Request, res: Response, next: NextFunction) => {
   res.send("Hello, world!");
 });
 
