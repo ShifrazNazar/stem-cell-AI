@@ -84,31 +84,23 @@ export const analyzeReportWithAI = async (aiReportText: string) => {
     4. Key health metrics critical for evaluating stem cell therapy effectiveness.
     5. A recommendation score (1-100) indicating overall suitability for stem cell therapy.
 
-    Format the response as:
+    Format the response as a JSON object with the following structure:
     {
-      "healthRisks": [{"risk": "Risk description",explanation": "Explanation", "severity": "low|medium|high"}],
+      "healthRisks": [{"risk": "Risk description", "explanation": "Explanation", "severity": "low|medium|high"}],
       "recommendations": [{"recommendation": "Recommendation description", "explanation": "Explanation", "impact": "low|medium|high"}],
       "summary": "Summary of the analysis",
       "criticalMetrics": ["Metric 1", "Metric 2", ...],
       "details": {
         "overview": "Overview of the report",
-        "focus": [
-          "Focus 1",
-          "Focus 2",
-          "Focus 3"
-        ],
-        "highlights": [
-          "Highlight 1",
-          "Highlight 2",
-          "Highlight 3"
-        ],
+        "focus": ["Focus 1", "Focus 2", "Focus 3"],
+        "highlights": ["Highlight 1", "Highlight 2", "Highlight 3"],
         "purpose": "Purpose of the report"
       },
-      "reportType": "Body Checkup Report,
-      "recommendationScore": "Score from 1 to 100",
+      "reportType": "Body Checkup Report",
+      "recommendationScore": "Score from 1 to 100"
     }
 
-    Important: Respond only with the JSON object.
+    Important: Respond only with the JSON object. Do not include any additional text or explanations outside the JSON object.
 
     Report Content:
     ${aiReportText}
@@ -123,13 +115,18 @@ export const analyzeReportWithAI = async (aiReportText: string) => {
 
     // Ensure valid JSON format
     responseText = responseText
-      .replace(/([{,]\s*)(\w+)(\s*:)/g, '$1"$2"$3')
-      .replace(/:\s*"([^"]*)"([^,}\]])/g, ': "$1"$2')
-      .replace(/,\s*}/g, "}");
+      .replace(/([{,]\s*)(\w+)(\s*:)/g, '$1"$2"$3') // Add quotes around keys
+      .replace(/:\s*"([^"]*)"([^,}\]])/g, ': "$1"$2') // Fix unquoted values
+      .replace(/,\s*}/g, "}"); // Remove trailing commas
 
-    console.log(responseText);
-
-    return JSON.parse(responseText);
+    // Validate JSON format
+    try {
+      const parsedResponse = JSON.parse(responseText);
+      return parsedResponse;
+    } catch (jsonError) {
+      console.error("Invalid JSON response from AI:", responseText);
+      throw new Error("AI response is not valid JSON.");
+    }
   } catch (error) {
     console.error("Error in analyzeReportWithAI:", error);
     throw new Error("Failed to analyze the report with AI.");
