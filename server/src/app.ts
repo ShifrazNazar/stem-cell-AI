@@ -54,16 +54,6 @@ app.use(
   })
 );
 
-// Increase timeout to 2 minutes
-app.use((req, res, next) => {
-  res.setTimeout(120000, () => {
-    // 120 seconds
-    console.error("Request timed out.");
-    res.status(504).json({ error: "Request timed out" });
-  });
-  next();
-});
-
 app.use(passport.initialize());
 app.use(passport.session());
 
