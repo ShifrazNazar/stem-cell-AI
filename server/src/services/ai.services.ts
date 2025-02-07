@@ -15,10 +15,13 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 const aiModel = genAI.getGenerativeModel({ model: AI_MODEL });
 
 export const extractTextFromPDF = async (fileKey: string): Promise<string> => {
+  console.log("Starting extractTextFromPDF...");
   try {
+    console.log("Fetching file data from Redis...");
     const fileData = await redis.get(fileKey);
     if (!fileData) throw new Error("File not found in Redis.");
 
+    console.log("Processing file data...");
     let fileBuffer: Uint8Array;
     if (Buffer.isBuffer(fileData)) {
       fileBuffer = new Uint8Array(fileData);
@@ -33,18 +36,20 @@ export const extractTextFromPDF = async (fileKey: string): Promise<string> => {
       throw new Error("File data format not recognized.");
     }
 
-    // Disable worker in a Node.js environment
+    console.log("Loading PDF document...");
     const pdf = await getDocument({
       data: fileBuffer,
       disableWorker: true,
     } as any).promise;
 
     let text = "";
+    console.log("Extracting text from PDF pages...");
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const content = await page.getTextContent();
       text += content.items.map((item: any) => item.str).join(" ") + "\n";
     }
+    console.log("Text extraction complete.");
     return text.trim();
   } catch (error) {
     console.error("Error in extractTextFromPDF:", error);
