@@ -85,6 +85,8 @@ export const analyzeReportWithAI = async (aiReportText: string) => {
     3. An assessment of the patient's suitability for stem cell therapy.
     4. Key health metrics critical for evaluating stem cell therapy effectiveness.
     5. A recommendation score (1-100) indicating overall suitability for stem cell therapy.
+    
+    Important: The recommendationScore must be a number between 1 and 100. Do not return "N/A" or any non-numeric value.
 
     Format the response as a JSON object with the following structure:
     {

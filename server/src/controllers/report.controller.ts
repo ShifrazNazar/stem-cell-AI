@@ -69,15 +69,21 @@ export const analyzeReport = async (req: Request, res: Response) => {
   }
 
   try {
+    console.time("File upload and Redis set");
     const fileKey = `file:${user._id}:${Date.now()}`;
     await redis.set(fileKey, req.file.buffer);
     await redis.expire(fileKey, 3600); // 1 hour
+    console.timeEnd("File upload and Redis set");
 
+    console.time("PDF text extraction");
     const pdfText = await extractTextFromPDF(fileKey);
-    let analysis;
+    console.timeEnd("PDF text extraction");
 
-    analysis = await analyzeReportWithAI(pdfText);
+    console.time("AI analysis");
+    let analysis = await analyzeReportWithAI(pdfText);
+    console.timeEnd("AI analysis");
 
+    console.time("Save analysis to DB");
     const savedAnalysis = await ReportAnalysisSchema.create({
       userId: user._id,
       aiReportText: pdfText,
@@ -86,6 +92,7 @@ export const analyzeReport = async (req: Request, res: Response) => {
       language: "en",
       aiModel: "gemini-pro",
     });
+    console.timeEnd("Save analysis to DB");
 
     res.json(savedAnalysis);
   } catch (error) {
