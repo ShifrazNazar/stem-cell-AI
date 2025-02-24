@@ -14,6 +14,7 @@ export const extractTextFromPDF = async (fileKey: string): Promise<string> => {
     }
 
     let fileBuffer: Uint8Array;
+
     if (Buffer.isBuffer(fileData)) {
       fileBuffer = new Uint8Array(fileData);
     } else if (typeof fileData === "object" && fileData !== null) {
