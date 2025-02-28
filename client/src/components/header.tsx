@@ -20,7 +20,7 @@ export function Header() {
           <Link href={"/"} className="mr-6 flex items-center space-x-2">
             HOME
           </Link>
-          <nav className="flex items-center space-x-7 text-sm font-medium">
+          <nav className="flex items-center space-x-7 text-lg font-medium">
             {navItems.map((item) => (
               <Link
                 key={item.name}
