@@ -1,20 +1,28 @@
+// src/services/ai.services.ts
 import redis from "../config/redis";
-import { getDocument } from "pdfjs-dist";
+import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import path from "path";
+
+// Ensure worker path is set for Node.js
+GlobalWorkerOptions.workerSrc = path.join(
+  __dirname,
+  "../../node_modules/pdfjs-dist/build/pdf.worker.js"
+);
 
 const AI_MODEL = "gemini-1.5-flash";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 const aiModel = genAI.getGenerativeModel({ model: AI_MODEL });
 
 export const extractTextFromPDF = async (fileKey: string): Promise<string> => {
+  console.log("Starting extractTextFromPDF...");
   try {
+    console.log("Fetching file data from Redis...");
     const fileData = await redis.get(fileKey);
-    if (!fileData) {
-      throw new Error("File not found in Redis.");
-    }
+    if (!fileData) throw new Error("File not found in Redis.");
 
+    console.log("Processing file data...");
     let fileBuffer: Uint8Array;
-
     if (Buffer.isBuffer(fileData)) {
       fileBuffer = new Uint8Array(fileData);
     } else if (typeof fileData === "object" && fileData !== null) {
@@ -28,13 +36,20 @@ export const extractTextFromPDF = async (fileKey: string): Promise<string> => {
       throw new Error("File data format not recognized.");
     }
 
-    const pdf = await getDocument({ data: fileBuffer }).promise;
+    console.log("Loading PDF document...");
+    const pdf = await getDocument({
+      data: fileBuffer,
+      disableWorker: true,
+    } as any).promise;
+
     let text = "";
+    console.log("Extracting text from PDF pages...");
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const content = await page.getTextContent();
       text += content.items.map((item: any) => item.str).join(" ") + "\n";
     }
+    console.log("Text extraction complete.");
     return text.trim();
   } catch (error) {
     console.error("Error in extractTextFromPDF:", error);
@@ -70,32 +85,26 @@ export const analyzeReportWithAI = async (aiReportText: string) => {
     3. An assessment of the patient's suitability for stem cell therapy.
     4. Key health metrics critical for evaluating stem cell therapy effectiveness.
     5. A recommendation score (1-100) indicating overall suitability for stem cell therapy.
+    
+    Important: The recommendationScore must be a number between 1 and 100. Do not return "N/A" or any non-numeric value.
 
-    Format the response as:
+    Format the response as a JSON object with the following structure:
     {
-      "healthRisks": [{"risk": "Risk description",explanation": "Explanation", "severity": "low|medium|high"}],
+      "healthRisks": [{"risk": "Risk description", "explanation": "Explanation", "severity": "low|medium|high"}],
       "recommendations": [{"recommendation": "Recommendation description", "explanation": "Explanation", "impact": "low|medium|high"}],
       "summary": "Summary of the analysis",
       "criticalMetrics": ["Metric 1", "Metric 2", ...],
       "details": {
         "overview": "Overview of the report",
-        "focus": [
-          "Focus 1",
-          "Focus 2",
-          "Focus 3"
-        ],
-        "highlights": [
-          "Highlight 1",
-          "Highlight 2",
-          "Highlight 3"
-        ],
+        "focus": ["Focus 1", "Focus 2", "Focus 3"],
+        "highlights": ["Highlight 1", "Highlight 2", "Highlight 3"],
         "purpose": "Purpose of the report"
       },
-      "reportType": "Body Checkup Report,
-      "recommendationScore": "Score from 1 to 100",
+      "reportType": "Body Checkup Report",
+      "recommendationScore": "Score from 1 to 100"
     }
 
-    Important: Respond only with the JSON object.
+    Important: Respond only with the JSON object. Do not include any additional text or explanations outside the JSON object.
 
     Report Content:
     ${aiReportText}
@@ -110,13 +119,18 @@ export const analyzeReportWithAI = async (aiReportText: string) => {
 
     // Ensure valid JSON format
     responseText = responseText
-      .replace(/([{,]\s*)(\w+)(\s*:)/g, '$1"$2"$3')
-      .replace(/:\s*"([^"]*)"([^,}\]])/g, ': "$1"$2')
-      .replace(/,\s*}/g, "}");
+      .replace(/([{,]\s*)(\w+)(\s*:)/g, '$1"$2"$3') // Add quotes around keys
+      .replace(/:\s*"([^"]*)"([^,}\]])/g, ': "$1"$2') // Fix unquoted values
+      .replace(/,\s*}/g, "}"); // Remove trailing commas
 
-    console.log(responseText);
-
-    return JSON.parse(responseText);
+    // Validate JSON format
+    try {
+      const parsedResponse = JSON.parse(responseText);
+      return parsedResponse;
+    } catch (jsonError) {
+      console.error("Invalid JSON response from AI:", responseText);
+      throw new Error("AI response is not valid JSON.");
+    }
   } catch (error) {
     console.error("Error in analyzeReportWithAI:", error);
     throw new Error("Failed to analyze the report with AI.");
