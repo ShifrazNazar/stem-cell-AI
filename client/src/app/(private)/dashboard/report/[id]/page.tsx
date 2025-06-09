@@ -2,6 +2,6 @@
 
 import ReportResults from "./_components/report-results";
 
-export default function ReportPage({ params }: { params: { id: string } }) {
-  return <ReportResults reportId={params.id} />;
+export default function ReportPage(props: any) {
+  return <ReportResults reportId={props.params.id} />;
 }
