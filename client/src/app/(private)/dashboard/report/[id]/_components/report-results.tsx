@@ -21,7 +21,7 @@ export default function ReportResults({ reportId }: IReportResultsProps) {
     if (user) {
       fetchAnalysisResults(reportId);
     }
-  }, [user]);
+  }, [user, reportId]);
 
   const fetchAnalysisResults = async (id: string) => {
     try {
