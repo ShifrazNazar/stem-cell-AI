@@ -1,14 +1,6 @@
 // src/services/ai.services.ts
 import redis from "../config/redis";
-import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import path from "path";
-
-// Ensure worker path is set for Node.js
-GlobalWorkerOptions.workerSrc = path.join(
-  __dirname,
-  "../../node_modules/pdfjs-dist/build/pdf.worker.js"
-);
 
 const AI_MODEL = "gemini-1.5-flash";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
@@ -35,6 +27,17 @@ export const extractTextFromPDF = async (fileKey: string): Promise<string> => {
     } else {
       throw new Error("File data format not recognized.");
     }
+
+    // Dynamically import pdfjs-dist for ESM compatibility
+    const pdfjsLib = await import("pdfjs-dist");
+    const { getDocument, GlobalWorkerOptions } = pdfjsLib;
+    const path = await import("path");
+
+    // Ensure worker path is set for Node.js
+    GlobalWorkerOptions.workerSrc = path.join(
+      __dirname,
+      "../../node_modules/pdfjs-dist/build/pdf.worker.js"
+    );
 
     console.log("Loading PDF document...");
     const pdf = await getDocument({
