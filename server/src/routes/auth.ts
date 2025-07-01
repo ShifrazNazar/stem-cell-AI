@@ -23,7 +23,6 @@ router.get(
 router.get("/current-user", (req: Request, res: Response) => {
   console.log("Session:", req.session);
   console.log("Session ID:", req.sessionID);
-  console.log("Cookies:", req.cookies);
   console.log("User:", req.user);
   console.log("Authenticated:", req.isAuthenticated());
   console.log("User Agent:", req.get("User-Agent"));

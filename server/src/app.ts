@@ -19,6 +19,10 @@ import reportsRoute from "./routes/reports";
 
 const app = express();
 
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
+
 // MongoDB Connection
 mongoose
   .connect(process.env.MONGODB_URI!)
@@ -46,8 +50,8 @@ app.use(
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
     cookie: {
-      httpOnly: false,
-      secure: false,
+      httpOnly: process.env.NODE_ENV === "production" ? true : false,
+      secure: process.env.NODE_ENV === "production" ? true : false,
       sameSite: "lax",
       maxAge: 24 * 60 * 60 * 1000,
       domain: process.env.NODE_ENV === "production" ? ".vercel.app" : undefined,
