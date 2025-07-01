@@ -46,10 +46,12 @@ app.use(
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
     cookie: {
+      httpOnly: process.env.NODE_ENV === "production",
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 24 * 60 * 60 * 1000,
-      domain: process.env.NODE_ENV === "production" ? ".vercel.app" : undefined,
+      domain:
+        process.env.NODE_ENV === "production" ? ".vercel.app" : ".vercel.app",
     },
   })
 );
