@@ -54,7 +54,7 @@ app.use(
       secure: process.env.NODE_ENV === "production" ? true : false,
       sameSite: "none",
       maxAge: 24 * 60 * 60 * 1000,
-      // domain: process.env.NODE_ENV === "production" ? ".vercel.app" : undefined,
+      domain: process.env.NODE_ENV === "production" ? ".vercel.app" : undefined,
     },
   })
 );
