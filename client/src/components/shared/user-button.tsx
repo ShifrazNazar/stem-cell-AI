@@ -12,21 +12,18 @@ import Link from "next/link";
 import { Icons } from "./icons";
 import { logout } from "@/lib/api";
 import { useRouter } from "next/navigation";
-import { useModalStore } from "@/store/zustand";
 
 export function UserButton() {
   const router = useRouter();
   const { user } = useCurrentUser();
-  const { openModal } = useModalStore();
 
   const handleLogout = async () => {
     await logout();
-    window.location.reload();
-    setInterval(() => router.push("/"), 1000);
+    router.push("/");
   };
 
   return (
-    <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+    <>
       {user ? (
         <>
           <DropdownMenu>
@@ -74,6 +71,6 @@ export function UserButton() {
           </Button>
         </>
       )}
-    </div>
+    </>
   );
 }

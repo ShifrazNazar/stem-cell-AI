@@ -3,7 +3,6 @@
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Button } from "./ui/button";
 import { UserButton } from "./shared/user-button";
 
 const navItems: { name: string; href: string }[] = [
@@ -14,22 +13,25 @@ export function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky px-4 top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
-      <div className="container flex h-16 items-center">
-        <div className="mr-4 hidden md:flex">
-          <Link href={"/"} className="mr-6 flex items-center space-x-2">
+    <header className="sticky top-0 z-50 w-full border-b bg-white/90 backdrop-blur shadow-sm">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+        <div className="flex items-center space-x-8">
+          <Link
+            href="/"
+            className="text-xl font-bold tracking-tight text-primary hover:opacity-80 transition-opacity"
+          >
             HOME
           </Link>
-          <nav className="flex items-center space-x-7 text-lg font-medium">
+          <nav className="hidden md:flex items-center space-x-6 text-base font-medium">
             {navItems.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  "transition-colors hover:text-foreground/80",
+                  "transition-colors px-2 py-1 rounded hover:bg-gray-100 hover:text-primary",
                   pathname === item.href
-                    ? "text-foreground"
-                    : "text-foreground/60"
+                    ? "text-primary bg-gray-100"
+                    : "text-gray-500"
                 )}
               >
                 {item.name}
@@ -37,7 +39,9 @@ export function Header() {
             ))}
           </nav>
         </div>
-        <UserButton />
+        <div className="flex items-center space-x-2">
+          <UserButton />
+        </div>
       </div>
     </header>
   );
