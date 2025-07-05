@@ -2,7 +2,6 @@
 
 import { useModalStore } from "@/store/zustand";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -13,8 +12,6 @@ import {
 } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { Loader2 } from "lucide-react";
-import { Checkbox } from "../ui/checkbox";
-import { Label } from "../ui/label";
 
 function googleSignIn(): Promise<void> {
   return new Promise((resolve) => {
@@ -24,7 +21,6 @@ function googleSignIn(): Promise<void> {
 }
 
 export function ConnectAccountModal() {
-  const [isAgreed, setIsAgreed] = useState(false);
   const modalKey = "connectAccountModal";
   const { isOpen, closeModal } = useModalStore();
 
@@ -39,11 +35,7 @@ export function ConnectAccountModal() {
   });
 
   const handleGoogleSignIn = async () => {
-    if (isAgreed) {
-      mutation.mutate();
-    } else {
-      toast.error("Please agree to the terms and conditions");
-    }
+    mutation.mutate();
   };
 
   return (
@@ -63,7 +55,7 @@ export function ConnectAccountModal() {
         <div className="grid gap-4 py-4">
           <Button
             onClick={handleGoogleSignIn}
-            disabled={!isAgreed || mutation.isPending}
+            disabled={mutation.isPending}
             className="w-full"
           >
             {mutation.isPending ? (
@@ -72,19 +64,6 @@ export function ConnectAccountModal() {
               <>Sign in with Google</>
             )}
           </Button>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="terms"
-              checked={isAgreed}
-              onCheckedChange={(checked) => setIsAgreed(checked as boolean)}
-            />
-            <Label
-              htmlFor="terms"
-              className="text-sm text-gray-500 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              I agree to the terms and conditions
-            </Label>
-          </div>
         </div>
       </DialogContent>
     </Dialog>
