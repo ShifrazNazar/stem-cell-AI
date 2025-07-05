@@ -1,19 +1,17 @@
 // src/services/ai.services.ts
 import redis from "../config/redis";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import path from "path";
 
 const AI_MODEL = "gemini-1.5-flash";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 const aiModel = genAI.getGenerativeModel({ model: AI_MODEL });
 
 export const extractTextFromPDF = async (fileKey: string): Promise<string> => {
-  console.log("Starting extractTextFromPDF...");
   try {
-    console.log("Fetching file data from Redis...");
     const fileData = await redis.get(fileKey);
     if (!fileData) throw new Error("File not found in Redis.");
 
-    console.log("Processing file data...");
     let fileBuffer: Uint8Array;
     if (Buffer.isBuffer(fileData)) {
       fileBuffer = new Uint8Array(fileData);
@@ -28,30 +26,26 @@ export const extractTextFromPDF = async (fileKey: string): Promise<string> => {
       throw new Error("File data format not recognized.");
     }
 
-    // Dynamically import pdfjs-dist for ESM compatibility
-    const pdfjsLib = await import("pdfjs-dist");
-    const { getDocument } = pdfjsLib;
-    // In Node.js, workerSrc is not required and should not be set
-    // (GlobalWorkerOptions is only needed in browser environments)
-    const path = await import("path");
+    const pdfjs = await import("pdfjs-dist");
+    const { getDocument, GlobalWorkerOptions } = pdfjs;
+    GlobalWorkerOptions.workerSrc = path.join(
+      __dirname,
+      "../../node_modules/pdfjs-dist/build/pdf.worker.js"
+    );
 
-    console.log("Loading PDF document...");
     const pdf = await getDocument({
       data: fileBuffer,
       disableWorker: true,
     } as any).promise;
 
     let text = "";
-    console.log("Extracting text from PDF pages...");
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const content = await page.getTextContent();
       text += content.items.map((item: any) => item.str).join(" ") + "\n";
     }
-    console.log("Text extraction complete.");
     return text.trim();
   } catch (error) {
-    console.error("Error in extractTextFromPDF:", error);
     throw new Error("Failed to extract text from PDF.");
   }
 };
@@ -71,7 +65,6 @@ export const detectReportType = async (
     const results = await aiModel.generateContent(prompt);
     return results.response?.text().trim() || "Unable to classify report.";
   } catch (error) {
-    console.error("Error in detectReportType:", error);
     throw new Error("Failed to detect report type.");
   }
 };
@@ -127,11 +120,9 @@ export const analyzeReportWithAI = async (aiReportText: string) => {
       const parsedResponse = JSON.parse(responseText);
       return parsedResponse;
     } catch (jsonError) {
-      console.error("Invalid JSON response from AI:", responseText);
       throw new Error("AI response is not valid JSON.");
     }
   } catch (error) {
-    console.error("Error in analyzeReportWithAI:", error);
     throw new Error("Failed to analyze the report with AI.");
   }
 };
