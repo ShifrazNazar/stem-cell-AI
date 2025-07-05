@@ -30,14 +30,10 @@ export const extractTextFromPDF = async (fileKey: string): Promise<string> => {
 
     // Dynamically import pdfjs-dist for ESM compatibility
     const pdfjsLib = await import("pdfjs-dist");
-    const { getDocument, GlobalWorkerOptions } = pdfjsLib;
+    const { getDocument } = pdfjsLib;
+    // In Node.js, workerSrc is not required and should not be set
+    // (GlobalWorkerOptions is only needed in browser environments)
     const path = await import("path");
-
-    // Ensure worker path is set for Node.js
-    GlobalWorkerOptions.workerSrc = path.join(
-      __dirname,
-      "../../node_modules/pdfjs-dist/build/pdf.worker.js"
-    );
 
     console.log("Loading PDF document...");
     const pdf = await getDocument({
