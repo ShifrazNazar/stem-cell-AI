@@ -69,8 +69,8 @@ export function UserButton() {
         </>
       ) : (
         <>
-          <Button onClick={() => openModal("connectAccountModal")}>
-            Sign in
+          <Button asChild>
+            <Link href="/login">Sign in</Link>
           </Button>
         </>
       )}

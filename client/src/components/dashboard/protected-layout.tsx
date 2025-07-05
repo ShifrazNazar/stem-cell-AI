@@ -1,6 +1,8 @@
 "use client";
 
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Loader2, LockIcon } from "lucide-react";
 import {
   Card,
@@ -15,6 +17,13 @@ import { useModalStore } from "@/store/zustand";
 
 export function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useCurrentUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.replace("/login");
+    }
+  }, [isLoading, user, router]);
 
   if (isLoading) {
     return (
@@ -27,11 +36,7 @@ export function ProtectedLayout({ children }: { children: React.ReactNode }) {
   }
 
   if (!user) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <AuthCard />
-      </div>
-    );
+    return null; // Or a minimal spinner, or nothing
   }
 
   return <>{children}</>;

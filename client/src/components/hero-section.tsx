@@ -54,18 +54,14 @@ export function HeroSection() {
   return (
     <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-background to-background/80">
       <div className="container px-4 md:px-6 flex flex-col items-center max-w-6xl mx-auto">
-        <Link
-          href={"/dashboard"}
-          className={cn(
-            buttonVariants({ variant: "outline", size: "sm" }),
-            "px-4 py-2 mb-4 rounded-full hidden md:flex"
-          )}
-        >
+        <div className="flex items-center gap-2 mb-4">
           <span className="mr-3 hidden md:block">
             <Zap className="size-3.5" />
           </span>
-          Introducing Advanced Stem Cell Therapy Metrics
-        </Link>
+          <h2 className="text-2xl font-bold">
+            Introducing Advanced Stem Cell Therapy Metrics
+          </h2>
+        </div>
         <div className="text-center mb-12 w-full">
           <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl xl:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary mb-4">
             Revolutionize Your Stem Cell Therapy Journey
@@ -75,13 +71,15 @@ export function HeroSection() {
             optimize your readiness for stem cell therapy.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Button
-              className="inline-flex items-center justify-center text-lg"
-              size={"lg"}
+            <Link
+              href={"/dashboard"}
+              className={cn(
+                buttonVariants({ size: "lg", variant: "default" }),
+                "inline-flex items-center justify-center text-lg"
+              )}
             >
               Get Started
-              <ArrowRight className="ml-2 size-5" />
-            </Button>
+            </Link>
             <Button
               className="inline-flex items-center justify-center text-lg"
               size={"lg"}
